@@ -3,4 +3,4 @@ project(aaarray)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(aaarray main.cpp)
+add_subdirectory("src")
