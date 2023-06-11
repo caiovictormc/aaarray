@@ -47,33 +47,3 @@ include_directories(${SDL2_INCLUDE_DIR})
 string(TIMESTAMP AFTER "%s")
 math(EXPR DELTASDL "${AFTER} - ${BEFORE}")
 MESSAGE(STATUS "SDL2 TIME: ${DELTASDL}s")
-
-# SDL_ttf
-string(TIMESTAMP BEFORE "%s")
-CPMAddPackage(GITHUB_REPOSITORY libsdl-org/SDL_ttf
-        GIT_TAG main
-        OPTIONS "SDL2TTF_INSTALL FALSE" "SDL2TTF_VENDORED TRUE") # vendor is required for mingw builds
-find_package(SDL_ttf REQUIRED)
-string(TIMESTAMP AFTER "%s")
-math(EXPR DELTASDL_ttf "${AFTER} - ${BEFORE}")
-MESSAGE(STATUS "SDL_ttf TIME: ${DELTASDL_ttf}s")
-
-## SDL_image
-string(TIMESTAMP BEFORE "%s")
-CPMAddPackage(
-    GITHUB_REPOSITORY libsdl-org/SDL_image
-    GIT_TAG main)
-find_package(SDL_image REQUIRED)
-string(TIMESTAMP AFTER "%s")
-math(EXPR DELTASDL_image "${AFTER} - ${BEFORE}")
-MESSAGE(STATUS "SDL_image TIME: ${DELTASDL_image}s")
-
-## SDL_mixer
-string(TIMESTAMP BEFORE "%s")
-CPMAddPackage(GITHUB_REPOSITORY libsdl-org/SDL_mixer
-        GIT_TAG main
-        OPTIONS "SDL2IMIXER_INSTALL FALSE" "SDL2MIXER_VENDORED TRUE") # vendor is required for mingw builds
-find_package(SDL_mixer REQUIRED)
-string(TIMESTAMP AFTER "%s")
-math(EXPR DELTASDL_mixer "${AFTER} - ${BEFORE}")
-MESSAGE(STATUS "SDL_mixer TIME: ${DELTASDL_mixer}s")
