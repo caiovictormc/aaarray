@@ -8,4 +8,4 @@ add_subdirectory("src")
 
 include_directories(${SDL2_INCLUDE_DIR})
 target_include_directories(aaarray PRIVATE ${SDL2_INCLUDE_DIR})
-target_link_libraries(aaarray SDL2)
+target_link_libraries(aaarray SDL2 IMGUI)
