@@ -3,6 +3,10 @@
 #include <iostream>
 #include <algorithm>
 
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_sdlrenderer.h"
+
 #include <SDL.h>
 
 #define SCREEN_WIDTH    800
@@ -45,6 +49,16 @@ int main(int argc, char *argv[]) {
             std::cout << "Renderer could not be created!" << std::endl
                       << "SDL_Error: " << SDL_GetError() << std::endl;
         } else {
+
+            IMGUI_CHECKVERSION();
+            ImGui::CreateContext();
+            ImGuiIO &io = ImGui::GetIO();
+            (void) io;
+            ImGui::StyleColorsDark();
+
+            ImGui_ImplSDL2_InitForOpenGL(window, renderer);
+            ImGui_ImplSDLRenderer_Init(renderer);
+
             // Declare rect of square
             SDL_Rect squareRect;
 
@@ -56,6 +70,7 @@ int main(int argc, char *argv[]) {
             squareRect.x = SCREEN_WIDTH / 2 - squareRect.w / 2;
             squareRect.y = SCREEN_HEIGHT / 2 - squareRect.h / 2;
 
+            ImVec4 my_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
             // Event loop exit flag
             bool quit = false;
@@ -65,7 +80,14 @@ int main(int argc, char *argv[]) {
                 SDL_Event e;
 
                 // Wait indefinitely for the next available event
-                SDL_WaitEvent(&e);
+                while (SDL_PollEvent(&e)) {
+                    ImGui_ImplSDL2_ProcessEvent(&e);
+                    if (e.type == SDL_QUIT)
+                        quit = true;
+                    if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_CLOSE &&
+                        e.window.windowID == SDL_GetWindowID(window))
+                        quit = true;
+                }
 
                 // User requests quit
                 if (e.type == SDL_QUIT) {
@@ -78,9 +100,35 @@ int main(int argc, char *argv[]) {
                 // Clear screen
                 SDL_RenderClear(renderer);
 
-                // Set renderer color red to draw the square
-                SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
+                ImGui_ImplSDLRenderer_NewFrame();
+                ImGui_ImplSDL2_NewFrame();
+                ImGui::NewFrame();
 
+                // ImGui Code
+                ImGui::Begin("Hello, world!");
+                ImGui::Text("Hi! :D");
+                ImGui::ColorEdit4("Color", (float *) &my_color);
+
+                float position_x = squareRect.x;
+                float position_y = squareRect.y;
+                ImGui::SliderFloat("X Position", &position_x, 0.0f, (float) SCREEN_WIDTH);
+                ImGui::SliderFloat("Y Position", &position_y, 0.0f, (float) SCREEN_HEIGHT);
+
+                ImGui::End();
+                ImGui::Render();
+                ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+
+                squareRect.x = position_x;
+                squareRect.y = position_y;
+
+                // Set renderer color red to draw the square
+                SDL_SetRenderDrawColor(
+                        renderer,
+                        (Uint8) (my_color.x * 255),
+                        (Uint8) (my_color.y * 255),
+                        (Uint8) (my_color.z * 255),
+                        (Uint8) (my_color.w * 255)
+                );
                 // Draw filled square
                 SDL_RenderFillRect(renderer, &squareRect);
 
@@ -93,6 +141,10 @@ int main(int argc, char *argv[]) {
         }
 
         // Destroy window
+        ImGui_ImplSDL2_Shutdown();
+        ImGui_ImplSDLRenderer_Shutdown();
+        ImGui::DestroyContext();
+
         SDL_DestroyWindow(window);
     }
 
